@@ -1,10 +1,11 @@
 import logging
 from pathlib import Path
-from aiohttp import web
 
+from aiohttp import web
 from server import PromptServer
 
 from .resolver import ModelResolverService
+from .downloader import DownloadManager
 
 PLUGIN_DIR = Path(__file__).resolve().parent
 WEB_DIR = PLUGIN_DIR / "web"
@@ -13,21 +14,18 @@ CONFIG_PATH = PLUGIN_DIR / "config.json"
 logger = logging.getLogger("ComfyUI-Auto-Model-Repair")
 
 service = ModelResolverService(plugin_dir=PLUGIN_DIR, config_path=CONFIG_PATH)
+download_manager = DownloadManager(service=service, plugin_dir=PLUGIN_DIR, config=service.config)
 
 routes = PromptServer.instance.routes
 
 
 @routes.get("/auto_model_repair/status")
 async def auto_model_repair_status(request):
-    try:
-        return web.json_response({
-            "ok": True,
-            "plugin": "ComfyUI-Auto-Model-Repair",
-            "version": "0.3.0",
-        })
-    except Exception as e:
-        logger.exception("status failed")
-        return web.json_response({"ok": False, "error": str(e)}, status=500)
+    return web.json_response({
+        "ok": True,
+        "plugin": "ComfyUI-Auto-Model-Repair",
+        "version": "0.5.1",
+    })
 
 
 @routes.post("/auto_model_repair/scan_workflow")
@@ -38,8 +36,7 @@ async def auto_model_repair_scan_workflow(request):
         if not workflow:
             return web.json_response({"ok": False, "error": "missing workflow"}, status=400)
 
-        result = service.scan_workflow(workflow)
-        return web.json_response({"ok": True, "data": result})
+        return web.json_response({"ok": True, "data": service.scan_workflow(workflow)})
     except Exception as e:
         logger.exception("scan_workflow failed")
         return web.json_response({"ok": False, "error": str(e)}, status=500)
@@ -75,6 +72,48 @@ async def auto_model_repair_apply_selected(request):
         return web.json_response({"ok": True, "data": result})
     except Exception as e:
         logger.exception("apply_selected failed")
+        return web.json_response({"ok": False, "error": str(e)}, status=500)
+
+
+@routes.post("/auto_model_repair/downloads/create")
+async def auto_model_repair_create_download(request):
+    try:
+        payload = await request.json()
+        result = download_manager.create_task(payload)
+        return web.json_response({"ok": True, "data": result})
+    except Exception as e:
+        logger.exception("create_download failed")
+        return web.json_response({"ok": False, "error": str(e)}, status=500)
+
+
+@routes.get("/auto_model_repair/downloads")
+async def auto_model_repair_list_downloads(request):
+    try:
+        return web.json_response({"ok": True, "data": download_manager.list_tasks()})
+    except Exception as e:
+        logger.exception("list_downloads failed")
+        return web.json_response({"ok": False, "error": str(e)}, status=500)
+
+
+@routes.post("/auto_model_repair/downloads/remove")
+async def auto_model_repair_remove_download(request):
+    try:
+        payload = await request.json()
+        result = download_manager.remove_task(payload.get("task_id"))
+        return web.json_response({"ok": True, "data": result})
+    except Exception as e:
+        logger.exception("remove_download failed")
+        return web.json_response({"ok": False, "error": str(e)}, status=500)
+
+
+@routes.post("/auto_model_repair/downloads/cancel")
+async def cancel_download(request):
+    try:
+        payload = await request.json()
+        result = download_manager.cancel_task(payload.get("task_id"))
+        return web.json_response({"ok": True, "data": result})
+    except Exception as e:
+        logger.exception("cancel_download failed")
         return web.json_response({"ok": False, "error": str(e)}, status=500)
 
 
