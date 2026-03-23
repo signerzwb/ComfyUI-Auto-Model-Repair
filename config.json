@@ -1,0 +1,48 @@
+{
+  "auto_apply_threshold": 92,
+  "candidate_threshold": 78,
+  "max_candidates": 5,
+  "folder_type_aliases": {
+    "checkpoints": ["ckpt", "checkpoint", "model", "sd", "sdxl"],
+    "unet": ["unet"],
+    "clip": ["clip", "text_encoder"],
+    "vae": ["vae"],
+    "loras": ["lora", "loras"]
+  },
+  "widget_name_rules": {
+    "ckpt_name": "checkpoints",
+    "checkpoint": "checkpoints",
+    "model_name": "checkpoints",
+    "unet_name": "unet",
+    "clip_name": "clip",
+    "vae_name": "vae",
+    "lora_name": "loras"
+  },
+  "node_title_rules": {
+    "checkpoint": "checkpoints",
+    "unet": "unet",
+    "clip": "clip",
+    "vae": "vae",
+    "lora": "loras"
+  },
+  "node_type_rules": {
+    "checkpointloadersimple": "checkpoints",
+    "checkpointloader": "checkpoints",
+    "unetloader": "unet",
+    "dualcliploader": "clip",
+    "cliploader": "clip",
+    "vaeloader": "vae",
+    "loraloader": "loras"
+  },
+  "ignore_extensions": [
+    ".txt",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".md",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp"
+  ]
+}
