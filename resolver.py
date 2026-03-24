@@ -69,12 +69,16 @@ class ModelResolverService:
             files = []
             try:
                 for filename in folder_paths.get_filename_list(folder_name):
-                    if Path(filename).suffix.lower() in ignore_exts:
+                    raw_name = str(filename).strip()
+                    normalized_name = raw_name.replace("\\", "/")
+
+                    if Path(normalized_name).suffix.lower() in ignore_exts:
                         continue
+
                     files.append(
                         {
-                            "filename": filename,
-                            "path": self._resolve_full_path(folder_name, filename),
+                            "filename": raw_name,
+                            "path": self._resolve_full_path(folder_name, raw_name),
                         }
                     )
             except Exception:
@@ -112,9 +116,9 @@ class ModelResolverService:
             pass
         return None
 
-    def _folder_candidates(self, folder_name: str) -> List[Path]:
+    def _folder_candidates(self, folder_name: str) -> List[str]:
         ignore_exts = set(self.config.get("ignore_extensions", []))
-        out: List[Path] = []
+        out: List[str] = []
 
         try:
             filenames = folder_paths.get_filename_list(folder_name)
@@ -122,9 +126,13 @@ class ModelResolverService:
             return out
 
         for filename in filenames:
-            if Path(filename).suffix.lower() in ignore_exts:
+            raw_name = str(filename).strip()
+            normalized_name = raw_name.replace("\\", "/")
+
+            if Path(normalized_name).suffix.lower() in ignore_exts:
                 continue
-            out.append(Path(self._resolve_full_path(folder_name, filename)))
+
+            out.append(raw_name)
 
         return out
 
@@ -181,7 +189,6 @@ class ModelResolverService:
         expected_raw = str(expected_filename).replace("\\", "/").strip()
         expected_name = Path(expected_raw).name
 
-        # 1. 完全匹配（路径一致）
         for name in names:
             raw_name = str(name).strip()
             normalized_name = raw_name.replace("\\", "/").strip()
@@ -193,7 +200,6 @@ class ModelResolverService:
                     "exact": True,
                 }
 
-        # 2. 同名匹配（不同目录）
         for name in names:
             raw_name = str(name).strip()
             normalized_name = raw_name.replace("\\", "/").strip()
@@ -343,7 +349,11 @@ class ModelResolverService:
                 exact_existing = existing_info["exact"]
 
                 normalized_expected = str(widget_value).replace("\\", "/").strip()
-                needs_path_fix = bool(exists and resolved_existing and resolved_existing.replace("\\", "/").strip() != normalized_expected)
+                needs_path_fix = bool(
+                    exists
+                    and resolved_existing
+                    and resolved_existing.replace("\\", "/").strip() != normalized_expected
+                )
 
                 candidates = []
                 best = None
