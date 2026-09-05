@@ -1,64 +1,74 @@
-安装及使用说明，作者的主页，在B站搜索 神都猫玩AI
-QQ群：340983417
+# 神都猫 ComfyUI 工作流助手 v1.0
 
-# ComfyUI-Auto-Model-Repair
+> 让从网上拿到的 ComfyUI 工作流，在你的机器上真正可运行、可复现、可读。
 
-> 🔧 自动检测并修复 ComfyUI 工作流中的缺失模型
+本仓库由 **ComfyUI-Auto-Model-Repair** 演进而来。它保留原仓库地址以兼容已有安装与收藏，但产品已经从“缺失模型修复”升级为完整的中文工作流助手。
 
----
+加入 AI 讨论QQ群：**340983417**
 
-## ✨ 功能特点
+## 它解决什么问题
 
-- 🔍 自动扫描工作流中的缺失模型（UNET / CLIP / VAE / LoRA）
-- 🧠 智能本地模糊匹配（支持不同命名）
-- 🎯 手动选择候选模型（精准替换）
-- ⚡ 一键自动修复高分匹配
-- 🌐 一键跳转搜索：
-  - 魔塔（ModelScope）
-  - HuggingFace
-- 🧩 悬浮式 UI，不影响原有界面
+网上的工作流经常同时存在缺失节点、缺失模型、无效旧分组和混乱排版。手动修复不只是安装缺失包：有些节点可以用本机节点替代，有些模型需要从官方仓库的正确目录下载，复杂工作流还需要按真实执行顺序重新组织。
 
----
+神都猫把这些工作拆成可验证、可确认的步骤：先检查事实，再给出方案，最后由你确认安装、下载、回填和排版。智能体只参与理解与规划，不能直接执行命令或修改你的环境。
 
-## 🚀 安装方法
+## 核心能力
 
-1. 克隆或下载到 `custom_nodes` 目录：
+- **工作流检查**：识别缺失节点、连接问题、模型引用、本机节点与模型目录状态。
+- **缺失节点修复安装**：按节点包聚合缺失实例，优先生成 ComfyUI-Manager 可执行的安装计划；同时保留本机替代节点建议，避免盲装。
+- **缺失模型修复下载**：识别 checkpoint、LoRA、VAE、ControlNet、文本编码器等模型需求；下载前精确核验仓库中是否存在目标文件。
+- **官方来源优先**：优先验证魔塔上的 Comfy-Org 官方文件树，再依次考虑其他魔塔、Hugging Face、CivitAI。仅标题相关的工作流不会被当成模型来源。
+- **下载管理**：最多三项并发、实时进度、临时文件断点续传、文件大小与 SHA-256 校验；成功后可自动回填节点并重新扫描。
+- **语义排版**：依据真实节点依赖从左到右、从上到下排列；主链在上，分支按纵向泳道展开；可删除旧分组并建立带用途说明的新分区。
+- **智能体理解**：支持兼容 OpenAI 接口的视觉/文本智能体，用于工作流解释、节点替代与模型来源检索、语义分区命名；每次发送范围都由前端明确提示并确认。
+- **历史与安全保护**：排版、下载前创建快照；下载仅接受受信任 HTTPS 域名与受限模型目录；密钥不会写入工作流、报告或 ComfyUI 配置文件。
+
+## 安装
+
+在 ComfyUI 的 `custom_nodes` 中克隆本仓库：
 
 ```bash
 cd ComfyUI/custom_nodes
 git clone https://github.com/signerzwb/ComfyUI-Auto-Model-Repair.git
+```
 
-# ComfyUI-Auto-Model-Repair
+重启 ComfyUI 后，在左侧栏点击 **神都猫工作流助手**。建议同时安装并启用 ComfyUI-Manager；它负责执行你确认过的缺失节点安装计划。
 
-> 🔧 Automatically detect and repair missing models in ComfyUI workflows
+## 快速使用
 
----
+1. 打开一个下载来的工作流。
+2. 打开“神都猫工作流助手”，在 **工作流检查** 点击“检查当前工作流”。该步骤不会修改任何内容。
+3. 到 **缺失节点修复安装** 查看按节点包合并的修复项，确认后交给 ComfyUI-Manager 安装。
+4. 到 **缺失模型修复下载** 点击“智能体查找来源”。确认候选中的文件名、用途、目标目录与来源后加入下载队列。
+5. 在 **语义排版** 生成方案。默认不修改参数和连线；应用前会保存快照，可撤销本次排版。
 
-## ✨ Features
+## 配置智能体
 
-- 🔍 Scan workflow and detect missing models (UNET / CLIP / VAE / LoRA)
-- 🧠 Smart fuzzy matching for local models
-- 🎯 Manual selection: choose which candidate to apply
-- ⚡ One-click auto repair for high-confidence matches
-- 🌐 Quick search links:
-  - ModelScope (魔塔)
-  - HuggingFace
-- 🧩 Non-intrusive UI (floating panel)
+在插件的 **设置** 页填写 API Key、API 地址与模型名称，然后点击“测试连接（不保存配置）”。默认密钥只保存在当前浏览器会话；勾选“在此浏览器中记住密钥”才会保存到该浏览器本地存储。
 
----
+密钥只会在你主动执行智能体操作时由本机后端临时转发到你填写的 API 地址，且不会写入 ComfyUI 配置、工作流、快照、报告或日志。
 
-## 📸 Preview
+## 模型来源原则
 
-- Scan missing models  
-- Show candidates with similarity score  
-- Manual selection & apply  
+模型下载不是模糊标题搜索。每一个可下载候选都必须满足：
 
----
+1. 文件树中存在与缺失项完全相同的安全权重文件；
+2. 文件类型与所需角色相符，例如 VAE 会默认放到 `models/vae`；
+3. 站点、文件大小与可用 SHA-256 能被验证；
+4. 用户明确确认后才入队下载。
 
-## 🚀 Installation
+如果无法满足这些条件，界面会明确显示“没有可靠下载候选”，而不是推荐不相干的模型或工作流。
 
-1. Clone or download into your `custom_nodes`:
+## 开发验证
 
-```bash
-cd ComfyUI/custom_nodes
-git clone https://github.com/yourname/ComfyUI-Auto-Model-Repair.git
+```powershell
+& 'C:\AI\comfyui\venv\python.exe' -m unittest discover -s '.\tests' -v
+& 'C:\AI\comfyui\venv\python.exe' -m compileall -q '.\workflow_agent'
+node --check .\web\workflow_agent.js
+```
+
+## 当前边界
+
+- 语义排版只改变画布位置与分组，不会改变参数、连线或执行顺序。
+- 节点安装、模型下载、节点替换都需要明确确认。
+- 模型许可证与使用限制仍应由使用者在下载前自行核对。
