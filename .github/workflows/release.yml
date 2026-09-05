@@ -1,0 +1,27 @@
+name: 发布 Windows 安装器
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: 检出发布版本
+        uses: actions/checkout@v4
+
+      - name: 构建 Windows 安装器
+        shell: powershell
+        run: .\installer\build.ps1
+
+      - name: 创建 GitHub Release 并上传安装器
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME ".\dist\ShenDuMao-ComfyUI-Workflow-Assistant-v1.0.0-Setup.exe" --title "神都猫 ComfyUI 工作流助手 $env:GITHUB_REF_NAME" --generate-notes

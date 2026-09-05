@@ -34,6 +34,14 @@ git clone https://github.com/signerzwb/ComfyUI-Auto-Model-Repair.git
 
 重启 ComfyUI 后，在左侧栏点击 **神都猫工作流助手**。建议同时安装并启用 ComfyUI-Manager；它负责执行你确认过的缺失节点安装计划。
 
+### Windows 一键安装
+
+在 [GitHub Releases](https://github.com/signerzwb/ComfyUI-Auto-Model-Repair/releases) 下载 `ShenDuMao-ComfyUI-Workflow-Assistant-v1.0.0-Setup.exe`，双击后按向导完成即可。安装器会自动识别常见的 ComfyUI 目录；若没有识别到，可手动选择含有 `main.py` 的 ComfyUI 根目录。它只会安装到 `custom_nodes\ComfyUI-Auto-Model-Repair`，不会改动模型、工作流或 ComfyUI 核心文件。
+
+### Windows 一键安装
+
+在 GitHub Releases 下载 `ShenDuMao-ComfyUI-Workflow-Assistant-v1.0.0-Setup.exe`，双击后按向导完成即可。安装器会自动识别常见的 ComfyUI 目录；若没有识别到，可手动选择含有 `main.py` 的 ComfyUI 根目录。它只会安装到 `custom_nodes\ComfyUI-Auto-Model-Repair`，不会改动模型、工作流或 ComfyUI 核心文件。
+
 ## 快速使用
 
 1. 打开一个下载来的工作流。
